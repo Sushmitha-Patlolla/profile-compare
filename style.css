@@ -1,135 +1,329 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+const compareBtn = document.getElementById("compareBtn");
 
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f7fb;
-    color: #222;
-    line-height: 1.6;
-}
+compareBtn.addEventListener("click", function () {
 
-header {
-    background: #243b53;
-    color: white;
-    text-align: center;
-    padding: 40px 20px;
-}
+    const profile1Url =
+        document.getElementById("profile1").value.trim();
 
-header h1 {
-    font-size: 36px;
-    margin-bottom: 10px;
-}
+    const profile2Url =
+        document.getElementById("profile2").value.trim();
 
-header p {
-    max-width: 700px;
-    margin: auto;
-}
+    const authorization =
+        document.getElementById("authorization").checked;
 
-main {
-    width: 90%;
-    max-width: 1000px;
-    margin: 30px auto;
-}
-
-.card,
-.result-card {
-    background: white;
-    padding: 25px;
-    margin-bottom: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-}
-
-.card h2 {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-top: 15px;
-    margin-bottom: 6px;
-    font-weight: bold;
-}
-
-input[type="url"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-}
-
-.checkbox {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: normal;
-}
-
-.checkbox input {
-    width: auto;
-}
-
-button {
-    margin-top: 20px;
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    background: #2563eb;
-    color: white;
-    font-size: 17px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #1d4ed8;
-}
-
-.comparison {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.comparison div {
-    background: #f8fafc;
-    padding: 15px;
-    border-radius: 8px;
-}
-
-ul {
-    padding-left: 20px;
-}
-
-li {
-    margin-bottom: 10px;
-}
-
-.privacy {
-    border-left: 5px solid #2563eb;
-}
-
-.hidden {
-    display: none;
-}
-
-footer {
-    text-align: center;
-    padding: 30px;
-    color: #666;
-}
-
-@media (max-width: 700px) {
-
-    .comparison {
-        grid-template-columns: 1fr;
+    if (!profile1Url || !profile2Url) {
+        alert("Please enter both profile URLs.");
+        return;
     }
 
-    header h1 {
-        font-size: 28px;
+    if (!authorization) {
+        alert("Please confirm that you own these profiles or have authorization to analyze them.");
+        return;
+    }
+
+    try {
+        new URL(profile1Url);
+        new URL(profile2Url);
+    } catch (error) {
+        alert("Please enter valid profile URLs.");
+        return;
+    }
+
+    compareProfiles();
+});
+
+
+function compareProfiles() {
+
+    /*
+        Demo profile data.
+
+        This version demonstrates the comparison interface.
+        It does not scrape real social-media profiles.
+    */
+
+    const profileData1 = {
+        description:
+            "Student interested in technology, web development and photography.",
+
+        links: [
+            "https://example.com/portfolio",
+            "https://example.com/github",
+            "https://example.com/blog"
+        ],
+
+        visibleInfo: [
+            "Technology interest",
+            "Photography interest",
+            "Web development interest"
+        ]
+    };
+
+
+    const profileData2 = {
+        description:
+            "Web developer interested in technology, photography and travel.",
+
+        links: [
+            "https://example.com/portfolio",
+            "https://example.com/github",
+            "https://example.com/travel"
+        ],
+
+        visibleInfo: [
+            "Technology interest",
+            "Photography interest",
+            "Travel interest"
+        ]
+    };
+
+
+    document.getElementById("results").classList.remove("hidden");
+
+
+    document.getElementById("description1").textContent =
+        profileData1.description;
+
+
+    document.getElementById("description2").textContent =
+        profileData2.description;
+
+
+    const commonLinks =
+        profileData1.links.filter(function (link) {
+
+            return profileData2.links.includes(link);
+
+        });
+
+
+    const commonLinksList =
+        document.getElementById("commonLinks");
+
+    commonLinksList.innerHTML = "";
+
+
+    if (commonLinks.length === 0) {
+
+        const li = document.createElement("li");
+
+        li.textContent = "No overlapping public links found.";
+
+        commonLinksList.appendChild(li);
+
+    } else {
+
+        commonLinks.forEach(function (link) {
+
+            const li = document.createElement("li");
+
+            li.textContent = link;
+
+            commonLinksList.appendChild(li);
+
+        });
+
+    }
+
+
+    findDifferences(profileData1, profileData2);
+
+    generatePrivacySuggestions(profileData1, profileData2);
+
+    generateCrossExposure(profileData1, profileData2);
+}
+
+
+function findDifferences(profile1, profile2) {
+
+    const differencesList =
+        document.getElementById("differences");
+
+    differencesList.innerHTML = "";
+
+
+    const differences =
+        profile1.visibleInfo.filter(function (info) {
+
+            return !profile2.visibleInfo.includes(info);
+
+        });
+
+
+    const differences2 =
+        profile2.visibleInfo.filter(function (info) {
+
+            return !profile1.visibleInfo.includes(info);
+
+        });
+
+
+    if (differences.length === 0 && differences2.length === 0) {
+
+        const li = document.createElement("li");
+
+        li.textContent =
+            "No major visible differences found.";
+
+        differencesList.appendChild(li);
+
+        return;
+    }
+
+
+    differences.forEach(function (info) {
+
+        const li = document.createElement("li");
+
+        li.textContent =
+            "Only Profile 1 shows: " + info;
+
+        differencesList.appendChild(li);
+
+    });
+
+
+    differences2.forEach(function (info) {
+
+        const li = document.createElement("li");
+
+        li.textContent =
+            "Only Profile 2 shows: " + info;
+
+        differencesList.appendChild(li);
+
+    });
+}
+
+
+function generatePrivacySuggestions(profile1, profile2) {
+
+    const suggestionsList =
+        document.getElementById("privacySuggestions");
+
+    suggestionsList.innerHTML = "";
+
+
+    const suggestions = [
+
+        "Review whether every public link needs to be visible.",
+
+        "Avoid publishing sensitive personal information.",
+
+        "Use consistent privacy settings across public profiles.",
+
+        "Remove outdated information that is no longer necessary."
+
+    ];
+
+
+    suggestions.forEach(function (suggestion) {
+
+        const li = document.createElement("li");
+
+        li.textContent = suggestion;
+
+        suggestionsList.appendChild(li);
+
+    });
+}
+
+
+function generateCrossExposure(profile1, profile2) {
+
+    const exposureList =
+        document.getElementById("crossExposure");
+
+    exposureList.innerHTML = "";
+
+
+    const commonInterests =
+        profile1.visibleInfo.filter(function (info) {
+
+            return profile2.visibleInfo.includes(info);
+
+        });
+
+
+    if (commonInterests.length === 0) {
+
+        const li = document.createElement("li");
+
+        li.textContent =
+            "No shared visible information was identified.";
+
+        exposureList.appendChild(li);
+
+        return;
+    }
+
+
+    commonInterests.forEach(function (info) {
+
+        const li = document.createElement("li");
+
+        li.textContent =
+            "Visible across both profiles: " + info;
+
+        exposureList.appendChild(li);
+
+    });
+
+
+    const linkCount =
+        profile1.links.filter(function (link) {
+
+            return profile2.links.includes(link);
+
+        }).length;
+
+
+    if (linkCount > 0) {
+
+        const li = document.createElement("li");
+
+        li.textContent =
+            linkCount +
+            " public link(s) appear across both profiles.";
+
+        exposureList.appendChild(li);
+
     }
 }
+
+
+/*
+    QR CODE
+
+    This QR code points to the public GitHub Pages website,
+    so a phone can open it.
+*/
+
+window.addEventListener("load", function () {
+
+    const qrContainer =
+        document.getElementById("qrcode");
+
+
+    if (
+        qrContainer &&
+        typeof QRCode !== "undefined"
+    ) {
+
+        qrContainer.innerHTML = "";
+
+
+        new QRCode(qrContainer, {
+
+            text:
+                "https://sushmitha-patlolla.github.io/profile-compare/",
+
+            width: 200,
+
+            height: 200
+
+        });
+
+    }
+
+});
