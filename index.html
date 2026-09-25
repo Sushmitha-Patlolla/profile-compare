@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profile Compare</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Profile Compare</h1>
+
+        <p>
+            Compare information visible across two public profiles
+            that you own or are authorized to analyze.
+        </p>
+    </header>
+
+
+    <main>
+
+        <!-- Profile Input Section -->
+
+        <section class="card">
+
+            <h2>Compare Profiles</h2>
+
+            <label for="profile1">
+                Profile 1 URL
+            </label>
+
+            <input
+                type="url"
+                id="profile1"
+                placeholder="https://example.com/profile1"
+            >
+
+
+            <label for="profile2">
+                Profile 2 URL
+            </label>
+
+            <input
+                type="url"
+                id="profile2"
+                placeholder="https://example.com/profile2"
+            >
+
+
+            <label class="checkbox">
+
+                <input
+                    type="checkbox"
+                    id="authorization"
+                >
+
+                I own these profiles or have authorization
+                to analyze them.
+
+            </label>
+
+
+            <button id="compareBtn">
+                Compare Profiles
+            </button>
+
+        </section>
+
+
+        <!-- Results Section -->
+
+        <section
+            id="results"
+            class="results hidden"
+        >
+
+            <h2>Comparison Results</h2>
+
+
+            <!-- Profile Descriptions -->
+
+            <div class="result-card">
+
+                <h3>Profile Descriptions</h3>
+
+                <div class="comparison">
+
+                    <div>
+
+                        <h4>Profile 1</h4>
+
+                        <p id="description1"></p>
+
+                    </div>
+
+
+                    <div>
+
+                        <h4>Profile 2</h4>
+
+                        <p id="description2"></p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Common Links -->
+
+            <div class="result-card">
+
+                <h3>
+                    Overlapping Public Links
+                </h3>
+
+                <ul id="commonLinks"></ul>
+
+            </div>
+
+
+            <!-- Differences -->
+
+            <div class="result-card">
+
+                <h3>
+                    Visible Differences
+                </h3>
+
+                <ul id="differences"></ul>
+
+            </div>
+
+
+            <!-- Privacy Suggestions -->
+
+            <div class="result-card privacy">
+
+                <h3>
+                    Privacy Suggestions
+                </h3>
+
+                <ul id="privacySuggestions"></ul>
+
+            </div>
+
+
+            <!-- Cross Profile Exposure -->
+
+            <div class="result-card exposure">
+
+                <h3>
+                    Cross-Profile Exposure
+                </h3>
+
+                <p>
+                    Information visible across multiple public
+                    profiles may reveal a more complete picture
+                    when viewed together.
+                </p>
+
+                <ul id="crossExposure"></ul>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- QR Code Section -->
+
+    <section class="qr-section">
+
+        <h2>
+            Share This Tool
+        </h2>
+
+        <p>
+            Scan this QR code to open the Profile Compare tool.
+        </p>
+
+        <div id="qrcode"></div>
+
+    </section>
+
+
+    <!-- Footer -->
+
+    <footer>
+
+        <p>
+            Use this tool only with profiles you own or are
+            authorized to analyze.
+        </p>
+
+    </footer>
+
+
+    <!-- QR Code Library -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+
+    <!-- Your JavaScript -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
