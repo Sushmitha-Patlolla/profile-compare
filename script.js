@@ -1,218 +1,215 @@
 const compareBtn = document.getElementById("compareBtn");
 
 compareBtn.addEventListener("click", function () {
+    const profile1Url = document.getElementById("profile1").value.trim();
+    const profile2Url = document.getElementById("profile2").value.trim();
+    const authorization = document.getElementById("authorization").checked;
 
-    const profile1 = document.getElementById("profile1").value.trim();
-    const profile2 = document.getElementById("profile2").value.trim();
-
-    const authorization =
-        document.getElementById("authorization").checked;
-
-    if (!profile1 || !profile2) {
+    if (!profile1Url || !profile2Url) {
         alert("Please enter both profile URLs.");
         return;
     }
 
     if (!authorization) {
-        alert("Please confirm that you own these profiles or are authorized to analyze them.");
+        alert("Please confirm that you own these profiles or have authorization to analyze them.");
         return;
     }
 
-    if (!isValidURL(profile1) || !isValidURL(profile2)) {
-        alert("Please enter valid URLs.");
+    try {
+        new URL(profile1Url);
+        new URL(profile2Url);
+    } catch (error) {
+        alert("Please enter valid profile URLs.");
         return;
     }
 
-    const profileData1 = {
-        description: "Web developer interested in technology and photography.",
-        links: [
-            "https://example.com",
-            "https://github.com/example"
-        ],
-        visibleInfo: [
-            "Technology",
-            "Photography",
-            "GitHub link"
-        ]
-    };
-
-    const profileData2 = {
-        description: "Software student | Photography enthusiast.",
-        links: [
-            "https://example.com",
-            "https://linkedin.com/in/example"
-        ],
-        visibleInfo: [
-            "Software student",
-            "Photography",
-            "LinkedIn link"
-        ]
-    };
-
-    compareProfiles(profileData1, profileData2);
+    compareProfiles(profile1Url, profile2Url);
 });
 
 
-function isValidURL(url) {
+function compareProfiles(profile1Url, profile2Url) {
 
-    try {
-        new URL(url);
-        return true;
-    } catch {
-        return false;
-    }
-}
+    // Demo data for Profile 1
+    const profileData1 = {
+        description:
+            "Web developer interested in technology and photography.",
+
+        links: [
+            "https://example.com",
+            "https://github.com"
+        ],
+
+        visibleInfo: [
+            "Technology",
+            "Photography",
+            "Web development"
+        ]
+    };
 
 
-function compareProfiles(profile1, profile2) {
+    // Demo data for Profile 2
+    const profileData2 = {
+        description:
+            "Software student and photography enthusiast.",
+
+        links: [
+            "https://example.com",
+            "https://linkedin.com"
+        ],
+
+        visibleInfo: [
+            "Software student",
+            "Photography",
+            "Student"
+        ]
+    };
+
 
     document.getElementById("results").classList.remove("hidden");
 
+
     document.getElementById("description1").textContent =
-        profile1.description;
+        profileData1.description;
+
 
     document.getElementById("description2").textContent =
-        profile2.description;
+        profileData2.description;
 
 
-    const commonLinks =
-        profile1.links.filter(link =>
-            profile2.links.includes(link)
-        );
+    // Find overlapping links
+    const commonLinks = profileData1.links.filter(function (link) {
+        return profileData2.links.includes(link);
+    });
 
-    const commonLinksElement =
+
+    const commonLinksList =
         document.getElementById("commonLinks");
 
-    commonLinksElement.innerHTML = "";
+    commonLinksList.innerHTML = "";
+
 
     if (commonLinks.length === 0) {
 
-        commonLinksElement.innerHTML =
-            "<li>No overlapping links found.</li>";
+        const li = document.createElement("li");
+
+        li.textContent =
+            "No overlapping public links found.";
+
+        commonLinksList.appendChild(li);
 
     } else {
 
-        commonLinks.forEach(link => {
+        commonLinks.forEach(function (link) {
 
             const li = document.createElement("li");
 
             li.textContent = link;
 
-            commonLinksElement.appendChild(li);
+            commonLinksList.appendChild(li);
 
         });
     }
 
 
-    const differences =
-        findDifferences(
-            profile1.visibleInfo,
-            profile2.visibleInfo
-        );
+    findDifferences(profileData1, profileData2);
 
-    const differencesElement =
+    generatePrivacySuggestions();
+
+    generateCrossExposure(profileData1, profileData2);
+}
+
+
+function findDifferences(profile1, profile2) {
+
+    const differencesList =
         document.getElementById("differences");
 
-    differencesElement.innerHTML = "";
+    differencesList.innerHTML = "";
 
-    differences.forEach(item => {
+
+    const differences1 =
+        profile1.visibleInfo.filter(function (info) {
+
+            return !profile2.visibleInfo.includes(info);
+
+        });
+
+
+    const differences2 =
+        profile2.visibleInfo.filter(function (info) {
+
+            return !profile1.visibleInfo.includes(info);
+
+        });
+
+
+    differences1.forEach(function (info) {
 
         const li = document.createElement("li");
 
-        li.textContent = item;
+        li.textContent =
+            "Profile 1 shows: " + info;
 
-        differencesElement.appendChild(li);
-
-    });
-
-
-    generatePrivacySuggestions(
-        profile1,
-        profile2
-    );
-
-
-    generateCrossExposure(
-        profile1,
-        profile2
-    );
-}
-
-
-function findDifferences(info1, info2) {
-
-    const differences = [];
-
-    info1.forEach(item => {
-
-        if (!info2.includes(item)) {
-
-            differences.push(
-                `Profile 1 shows: ${item}`
-            );
-
-        }
+        differencesList.appendChild(li);
 
     });
 
 
-    info2.forEach(item => {
+    differences2.forEach(function (info) {
 
-        if (!info1.includes(item)) {
+        const li = document.createElement("li");
 
-            differences.push(
-                `Profile 2 shows: ${item}`
-            );
+        li.textContent =
+            "Profile 2 shows: " + info;
 
-        }
+        differencesList.appendChild(li);
 
     });
 
 
-    if (differences.length === 0) {
+    if (
+        differences1.length === 0 &&
+        differences2.length === 0
+    ) {
 
-        differences.push(
-            "No major differences detected."
-        );
+        const li = document.createElement("li");
 
+        li.textContent =
+            "No major visible differences found.";
+
+        differencesList.appendChild(li);
     }
-
-    return differences;
 }
 
 
-function generatePrivacySuggestions(profile1, profile2) {
+function generatePrivacySuggestions() {
 
-    const suggestions = [];
-
-    suggestions.push(
-        "Review whether all linked websites need to be publicly visible."
-    );
-
-    suggestions.push(
-        "Check whether the same personal information is necessary on both profiles."
-    );
-
-    suggestions.push(
-        "Avoid publishing sensitive personal information such as your home address or private contact details."
-    );
-
-    suggestions.push(
-        "Review privacy settings regularly on each platform."
-    );
-
-    const list =
+    const suggestionsList =
         document.getElementById("privacySuggestions");
 
-    list.innerHTML = "";
+    suggestionsList.innerHTML = "";
 
-    suggestions.forEach(suggestion => {
+
+    const suggestions = [
+
+        "Review whether all linked websites need to be publicly visible.",
+
+        "Avoid publishing sensitive personal information.",
+
+        "Check whether the same information is visible across multiple profiles.",
+
+        "Review privacy settings regularly on each platform."
+
+    ];
+
+
+    suggestions.forEach(function (suggestion) {
 
         const li = document.createElement("li");
 
         li.textContent = suggestion;
 
-        list.appendChild(li);
+        suggestionsList.appendChild(li);
 
     });
 }
@@ -225,50 +222,82 @@ function generateCrossExposure(profile1, profile2) {
 
     exposureList.innerHTML = "";
 
+
+    const commonInformation =
+        profile1.visibleInfo.filter(function (info) {
+
+            return profile2.visibleInfo.includes(info);
+
+        });
+
+
+    commonInformation.forEach(function (info) {
+
+        const li = document.createElement("li");
+
+        li.textContent =
+            "Visible across both profiles: " + info;
+
+        exposureList.appendChild(li);
+
+    });
+
+
     const profile1Only =
-        profile1.visibleInfo.filter(
-            item => !profile2.visibleInfo.includes(item)
-        );
+        profile1.visibleInfo.filter(function (info) {
+
+            return !profile2.visibleInfo.includes(info);
+
+        });
+
 
     const profile2Only =
-        profile2.visibleInfo.filter(
-            item => !profile1.visibleInfo.includes(item)
-        );
+        profile2.visibleInfo.filter(function (info) {
+
+            return !profile1.visibleInfo.includes(info);
+
+        });
 
 
-    profile1Only.forEach(item => {
+    profile1Only.forEach(function (info) {
 
         const li = document.createElement("li");
 
         li.textContent =
-            `Profile 1 contributes additional information: ${item}`;
+            "Profile 1 contributes additional information: " + info;
 
         exposureList.appendChild(li);
 
     });
 
 
-    profile2Only.forEach(item => {
+    profile2Only.forEach(function (info) {
 
         const li = document.createElement("li");
 
         li.textContent =
-            `Profile 2 contributes additional information: ${item}`;
+            "Profile 2 contributes additional information: " + info;
 
         exposureList.appendChild(li);
 
     });
 
 
-    if (
-        profile1Only.length === 0 &&
-        profile2Only.length === 0
-    ) {
+    const sharedLinks =
+        profile1.links.filter(function (link) {
+
+            return profile2.links.includes(link);
+
+        });
+
+
+    if (sharedLinks.length > 0) {
 
         const li = document.createElement("li");
 
         li.textContent =
-            "Both profiles expose similar information.";
+            sharedLinks.length +
+            " public link(s) appear across both profiles.";
 
         exposureList.appendChild(li);
 
@@ -276,19 +305,31 @@ function generateCrossExposure(profile1, profile2) {
 }
 
 
-/* QR CODE */
+// QR CODE
 
 window.addEventListener("load", function () {
 
     const qrContainer =
         document.getElementById("qrcode");
 
-    if (qrContainer && typeof QRCode !== "undefined") {
+
+    if (
+        qrContainer &&
+        typeof QRCode !== "undefined"
+    ) {
+
+        qrContainer.innerHTML = "";
+
 
         new QRCode(qrContainer, {
-            text: window.location.href,
+
+            text:
+                "https://sushmitha-patlolla.github.io/profile-compare/",
+
             width: 200,
+
             height: 200
+
         });
 
     }
